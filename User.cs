@@ -1,7 +1,7 @@
 using System;
 
-namespace MainfreightProject
-{
+namespace MainfreightProject;
+
     //this is the user class whihc is used to stotre common user details, for all the different users in the mainfreihgt system
     public class User
     {
@@ -21,9 +21,9 @@ namespace MainfreightProject
         public string ViewProfile()
         {
             return "User ID: " + userID +
-             "\nName" + "\nEmail: " + email ;
-            // returns the thhe user detials in one one 
+             "\nName" + name + "\nEmail: " + email ;
+            // returns the  user detials in one go
     }
 }
 
-}   
+  

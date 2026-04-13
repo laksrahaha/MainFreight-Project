@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace MainfreightProject;
 
 //the class contains its user detials form the user class and reprresntd the customer
-public class Customer
+public class Customer : User
 { 
     private string customerID;
     private string contactDetails;
@@ -34,3 +34,7 @@ public class Customer
     }
 
 }
+
+    
+
+
