@@ -20,9 +20,12 @@ public class TrackingUpdates
         
     }
 
+//Viewupdate returns the tracking updates detials to the user so they can see the vhanges made.
     public string ViewUpdate()
     {
-        return updateMessage;
+        return "Update ID: " + updateID +
+               "\nTime: " + timeStamp +
+               "\nMessage: " + updateMessage;
     }
 
 }
