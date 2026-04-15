@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace MainfreightProject;
 
@@ -29,7 +30,7 @@ namespace MainfreightProject;
         public void TrackShipment()
         {
             //this is the message that will dislpay where the shipment currently is
-            Console.WriteLine("Shipment" + shipmentID + " is located currently at" + currentLocation);
+            Console.WriteLine("Shipment" + shipmentID + " is located currently at " + currentLocation);
         
         }
 

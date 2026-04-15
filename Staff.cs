@@ -9,7 +9,7 @@ public class Staff:User
     private string staffID;
     private string department;
 
-//intilazinig the objects of this class, using base to extend the class., Generalzation
+//intilazinig the objects of this class, using base to extend the class Generalzation
     public Staff(string userID, string name, string email, string staffID, string department)
         : base(userID, name, email)
     {
@@ -27,9 +27,19 @@ public class Staff:User
 //this is the method for updating the status by the staff member
     public void UpdateShipmentStatus(Shipment shipment, string newStatus)
     {
-        //this will the updatestauts method on the shipment object then give it the new value that they wih to  update
+        //this will the updatestauts method on the shipment object then give it the new value that they wih to update
         shipment.UpdateStatus(newStatus);
-        Console.WriteLine("Shipment status updated to:" +  newStatus);
+
+        //this creates a new tracking update object when the status is changed by staff
+        TrackingUpdates newUpdate = new TrackingUpdates(
+            "UPD" + DateTime.Now.Ticks,
+            DateTime.Now,
+            "Shipment status updated to: " + newStatus);
+
+        //this adds the new tracking update into the shipment history list
+        shipment.AddTrackingUpdate(newUpdate);
+
+        Console.WriteLine("The Shipment status updated to:" +  newStatus);
     }
 }
 
