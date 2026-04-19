@@ -13,7 +13,7 @@ namespace MainfreightProject;
         private string deliveryStatus;
 
 //this list will contain all the tracking updates that are needed to be diplayed in trackingupdates
-        private List<TrackingUpdates> trackingUpdates;
+        private List<TrackingUpdate> trackingUpdate;
 
        //this si the contructor class i ma intialising the objects , whihc are the shipment detials needed
         public Shipment(string shipmentID,string status , string currentLocation, string deliveryStatus)
@@ -24,29 +24,39 @@ namespace MainfreightProject;
             this.deliveryStatus = deliveryStatus;
 
         // this is an empty list that is needed so updates cna be added alter
-            trackingUpdates = new List<TrackingUpdates>();
+            trackingUpdate = new List<TrackingUpdate>();
+        }
+
+        public bool matchShipmentID(string inputID)
+        {
+            return shipmentID.Equals(inputID, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public string getShipmentID()
+        {
+            return shipmentID;
         }
 
         public void TrackShipment()
         {
             //this is the message that will dislpay where the shipment currently is
-            Console.WriteLine("Shipment" + shipmentID + " is located currently at " + currentLocation);
+            Console.WriteLine("Shipment " + shipmentID + " is located currently at " + currentLocation);
         
         }
 
 //te method adds the trackinupdate obect to the shipemt update list 
-        public void AddTrackingUpdate(TrackingUpdates updateShipment)
+        public void AddTrackingUpdate(TrackingUpdate updateShipment)
         {
 
-        trackingUpdates.Add(updateShipment);
+        trackingUpdate.Add(updateShipment);
 
         }
 
 //this mehtod tracks all the updates that are made or exxits in the shipment 
 //it does this by calling on trackinupdates list that we have created and the shipemnt lsit that sotres the update 
-        public void ViewTrackingHistory()
+        public void viewTrackingHistory()
         {
-            if (trackingUpdates.Count == 0)
+            if (trackingUpdate.Count == 0)
             {
                 Console.WriteLine("No tracking updates are available for this shipment.");
             }
@@ -54,7 +64,7 @@ namespace MainfreightProject;
             {
                 Console.WriteLine("Tracking updates for shipment " + shipmentID + ":");
 
-                foreach (TrackingUpdates updateShipment in trackingUpdates)
+                foreach (TrackingUpdate updateShipment in trackingUpdate)
                 {
                     Console.WriteLine(updateShipment.ViewUpdate());
                     Console.WriteLine();
@@ -70,9 +80,14 @@ namespace MainfreightProject;
         
         }
 
+        public void UpdateDeliveryStatus(string newDeliveryStatus)
+        {
+            deliveryStatus = newDeliveryStatus;
+        }
+
         public string getShipmentInfo()
         {
-            // di[lays the inofmration tha tis requested on one line]
+            // dislays the inofmration tha tis requested on one line
             return "Shipment ID:" + shipmentID +
             "\nShipment Status:" + status +
             "\nCurrent Location: " + currentLocation +
@@ -80,5 +95,3 @@ namespace MainfreightProject;
         }
     
     }
-
-

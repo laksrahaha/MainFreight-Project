@@ -2,13 +2,15 @@ using System;
 
 namespace MainfreightProject;
 
-public class TrackingUpdates
+//construcor class to intialzie objects , to allow those objects
+public class TrackingUpdate
 {
     private string updateID;
     private DateTime timeStamp;
     private string updateMessage;
 
-    public TrackingUpdates (string updateID, DateTime timeStamp, string updateMessage)
+//contructor class
+    public TrackingUpdate (string updateID, DateTime timeStamp, string updateMessage)
     {
         this.updateID = updateID;
         this.timeStamp = timeStamp;
@@ -23,8 +25,7 @@ public class TrackingUpdates
 //Viewupdate returns the tracking updates detials to the user so they can see the vhanges made.
     public string ViewUpdate()
     {
-        return "Update ID: " + updateID +
-               "\nTime: " + timeStamp +
+        return "Time: " + timeStamp.ToString("dd/MM/yyyy h:mm tt") +
                "\nMessage: " + updateMessage;
     }
 

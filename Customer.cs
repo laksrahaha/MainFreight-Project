@@ -25,15 +25,33 @@ public class Customer : User
 
     }
 
-    public string ViewcustomerInfo()
+    public string ViewcustomerInfo() 
     {
         //this returns the customer detials in one line
-        return "Customer ID: " + customerID +
+        return base.ViewProfile() + "Customer ID: " + customerID +
                    "\nContact Details: " + contactDetails +
                    "\nAddress: " + address;
     }
 
+
+//the mehtod to input the new contact details, new object to store
+    public void updateContactDetails(string newContactDetails)
+    {
+        contactDetails = newContactDetails;
+    }
+
+    //the new input to update the adress, creates a new object to store 
+
+    public void UpdateAddress(string newAddress)
+    {
+        address = newAddress;
+    }
+
 }
+
+
+
+
 
     
 

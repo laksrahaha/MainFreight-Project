@@ -21,7 +21,8 @@ namespace MainfreightProject;
         public string ViewProfile()
         {
             return "User ID: " + userID +
-             "\nName" + name + "\nEmail: " + email ;
+             "\nName" + name + 
+             "\nEmail: " + email ;
             // returns the  user detials in one go
     }
 }

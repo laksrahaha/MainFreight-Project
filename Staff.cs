@@ -20,7 +20,7 @@ public class Staff:User
 // this returns the message how the details fo the staff
     public string ViewStaffInfo()
     {
-        return "Staff ID: " + staffID +
+        return base.ViewProfile() + "Staff ID: " + staffID +
                "\nDepartment: " + department;
     }
 
@@ -29,9 +29,10 @@ public class Staff:User
     {
         //this will the updatestauts method on the shipment object then give it the new value that they wih to update
         shipment.UpdateStatus(newStatus);
+        shipment.UpdateDeliveryStatus(newStatus);
 
         //this creates a new tracking update object when the status is changed by staff
-        TrackingUpdates newUpdate = new TrackingUpdates(
+        TrackingUpdate newUpdate = new TrackingUpdate(
             "UPD" + DateTime.Now.Ticks,
             DateTime.Now,
             "Shipment status updated to: " + newStatus);
@@ -39,7 +40,6 @@ public class Staff:User
         //this adds the new tracking update into the shipment history list
         shipment.AddTrackingUpdate(newUpdate);
 
-        Console.WriteLine("The Shipment status updated to:" +  newStatus);
+        Console.WriteLine("The Shipment status updated to: " +  newStatus);
     }
 }
-
