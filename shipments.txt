@@ -1,0 +1,3 @@
+Ship1|In Transit|Auckland Depot|Not Delivered
+Ship2|Delivered|Manukau Hub|Delivered
+Ship3|Delayed|Hamilton Depot|Not Delivered
