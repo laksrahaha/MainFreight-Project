@@ -74,6 +74,10 @@ public class ShipmentController
 
         Shipment newShipment = new Shipment(shipmentID, shipmentStatus, currentLocation, deliveryStatus);
 
+        //new shipments also need the same status listeners as the startup shipments
+        //so future status changes can update tracking history and visibility outputs
+        RegisterStatusListenersForShipment(newShipment);
+
         bool added = shipmentRepo.AddShipment(newShipment);
 
         if (added)
@@ -110,5 +114,12 @@ public class ShipmentController
         {
             return "Invalid department shipment operation selected.";
         }
+    }
+
+    private void RegisterStatusListenersForShipment(Shipment shipment)
+    {
+        shipment.AttachStatusListener(new TrackingUpdateRecorder());
+        shipment.AttachStatusListener(new CustomerStatusNotifier());
+        shipment.AttachStatusListener(new StaffStatusNotifier());
     }
 }

@@ -42,7 +42,9 @@ public class Staff : User
             shipment.UpdateDeliveryStatus("Not Delivered");
         }
 
-        
+        //this will call the UpdateStatus method on the shipment object
+        //Shipment now notifies its registered status listeners after the status changes
+        //so tracking history/customer/staff updates are not manually controlled by Staff
         shipment.UpdateStatus(newStatus);
 
         Console.WriteLine("The Shipment status updated to: " + newStatus);
