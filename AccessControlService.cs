@@ -8,8 +8,39 @@ namespace MainfreightProject;
 // and manage shipment records if needed
 // Keeping this responsibility separate supports and
 // clearer business rules and better role-based control
-public class AccessControlService
+//it also implemte IAuthorize interface for the role based staff/admin acess without changing shipment controller
+
+
+public class AccessControlService : IAuthorize
 {
+    public bool CanUseStaffOperations(UserAccount account)
+    {
+        return account != null &&
+               account.IsActive &&
+               (account.Role == UserRole.Staff || account.Role == UserRole.Admin);
+    }
+
+    public bool CanManageShipmentRecords(UserAccount account)
+    {
+        return account != null &&
+               account.IsActive &&
+               (account.Role == UserRole.Staff || account.Role == UserRole.Admin);
+    }
+
+    public bool CanRunDepartmentOperations(UserAccount account)
+    {
+        return account != null &&
+               account.IsActive &&
+               (account.Role == UserRole.Staff || account.Role == UserRole.Admin);
+    }
+
+    public bool CanManageUserAccess(UserAccount account)
+    {
+        return account != null &&
+               account.IsActive &&
+               account.Role == UserRole.Admin;
+    }
+
     public bool CanCustomerViewShipment(Customer customer, Shipment assignedShipment)
     {
         return customer != null && assignedShipment != null;

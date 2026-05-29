@@ -1,0 +1,2 @@
+staff1|pass123|Staff|User2|true
+admin1|pass125|Admin|Admin1|true
