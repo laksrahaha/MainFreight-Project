@@ -13,16 +13,13 @@ public class ReturnedGoodsOperation : IShipmentOperation
 {
     public void ExecuteOperation(Shipment shipment, Staff staffMember)
     {
-        Console.WriteLine("\n=== Factory Method Demonstration ===");
-        Console.WriteLine("Factory created: ReturnedGoodsOperation");
-        Console.WriteLine("Executed through: IShipmentOperation");
-        Console.WriteLine("\n--- Returned Goods Operation ---");
-        Console.WriteLine("Purpose: supports return processing and reverse logistics.");
-
-        Console.WriteLine("\nHandled by:");
+        Console.WriteLine("Returned goods operation selected.");
+        Console.WriteLine("Assigned staff:");
         Console.WriteLine(staffMember.ViewStaffInfo());
-
-        Console.WriteLine("\nShipment involved:");
+        Console.WriteLine();
+        Console.WriteLine("Shipment details:");
         Console.WriteLine(shipment.getShipmentInfo());
+        Console.WriteLine();
+        
     }
 }

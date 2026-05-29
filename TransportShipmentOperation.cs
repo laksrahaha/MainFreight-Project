@@ -8,20 +8,19 @@ namespace MainfreightProject;
 
 // Yhis helps becasue the Transport staff focus on shipment movement, depot transfer, and delivery progress.
 // Keeping this in its own class improves cohesion because this class has one focused job it provides better cohesion
+
 public class TransportShipmentOperation : IShipmentOperation
 {
     public void ExecuteOperation(Shipment shipment, Staff staffMember)
     {
-        Console.WriteLine("\n=== Factory Method Demonstration ===");
-        Console.WriteLine("Factory created: TransportShipmentOperation");
-        Console.WriteLine("Executed through: IShipmentOperation");
-        Console.WriteLine("\n--- Transport Shipment Operation ---");
-        Console.WriteLine("Purpose: supports movement tracking, depot transfer, and delivery coordination.");
-
-        Console.WriteLine("\nHandled by:");
+        Console.WriteLine("Transport operation selected.");
+        Console.WriteLine();
+        Console.WriteLine("Assigned staff:");
         Console.WriteLine(staffMember.ViewStaffInfo());
-
-        Console.WriteLine("\nShipment involved:");
+        Console.WriteLine();
+        Console.WriteLine("Shipment details:");
         Console.WriteLine(shipment.getShipmentInfo());
+        Console.WriteLine();
+        
     }
 }
