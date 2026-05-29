@@ -12,16 +12,13 @@ public class CustomerServiceOperation : IShipmentOperation
 {
     public void ExecuteOperation(Shipment shipment, Staff staffMember)
     {
-        Console.WriteLine("\n=== Factory Method Demonstration ===");
-        Console.WriteLine("Factory created: CustomerServiceOperation");
-        Console.WriteLine("Executed through: IShipmentOperation");
-        Console.WriteLine("\n--- Customer Service Operation ---");
-        Console.WriteLine("Purpose: supports customer enquiry handling and shipment status explanation.");
-
-        Console.WriteLine("\nHandled by:");
+        Console.WriteLine("Customer service operation selected.");
+        Console.WriteLine("Assigned staff:");
         Console.WriteLine(staffMember.ViewStaffInfo());
-
-        Console.WriteLine("\nShipment involved:");
+        Console.WriteLine();
+        Console.WriteLine("Shipment details:");
         Console.WriteLine(shipment.getShipmentInfo());
+        Console.WriteLine();
+        
     }
 }

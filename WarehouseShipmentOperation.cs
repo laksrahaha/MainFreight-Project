@@ -11,16 +11,13 @@ public class WarehouseShipmentOperation : IShipmentOperation
 {
     public void ExecuteOperation(Shipment shipment, Staff staffMember)
     {
-        Console.WriteLine("\n=== Factory Method Demonstration ===");
-        Console.WriteLine("Factory created: WarehouseShipmentOperation");
-        Console.WriteLine("Executed through: IShipmentOperation");
-        Console.WriteLine("\n--- Warehouse Shipment Operation ---");
-        Console.WriteLine("Purpose: supports depot handling, storage visibility, and warehouse processing.");
-
-        Console.WriteLine("\nHandled by:");
+        Console.WriteLine("Warehouse operation selected.");
+        Console.WriteLine("Assigned staff:");
         Console.WriteLine(staffMember.ViewStaffInfo());
-
-        Console.WriteLine("\nShipment involved:");
+        Console.WriteLine();
+        Console.WriteLine("Shipment details:");
         Console.WriteLine(shipment.getShipmentInfo());
+        Console.WriteLine();
+        
     }
 }
