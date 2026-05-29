@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace MainfreightProject;
@@ -9,6 +10,7 @@ namespace MainfreightProject;
 // coordinates business workflows such as updating shipment status, adding a
 // shipment, and running a department shipment operation
 //
+
 public class ShipmentController
 {
     private IShipmentRepo shipmentRepo;
@@ -37,6 +39,11 @@ public class ShipmentController
 
     public string UpdateShipmentStatus(Staff staffMember, string shipmentID, string newStatus)
     {
+        return UpdateShipmentStatus(staffMember, shipmentID, newStatus, "");
+    }
+
+    public string UpdateShipmentStatus(Staff staffMember, string shipmentID, string newStatus, string newLocation)
+    {
         Shipment shipment = shipmentRepo.FindShipmentByID(shipmentID);
 
         if (shipment == null)
@@ -49,10 +56,23 @@ public class ShipmentController
             return "Access denied. Staff member is not allowed to update this shipment.";
         }
 
-        staffMember.UpdateShipmentStatus(shipment, newStatus);
+        if (string.IsNullOrWhiteSpace(newLocation))
+        {
+            staffMember.UpdateShipmentStatus(shipment, newStatus);
+        }
+        else
+        {
+            shipment.UpdateStatusAndLocation(newStatus, newLocation);
+        }
+
         shipmentRepo.SaveChanges();
 
-        return "Shipment status workflow completed through ShipmentController.";
+        if (string.IsNullOrWhiteSpace(newLocation))
+        {
+            return "Shipment " + shipmentID + " has been updated to " + newStatus + ".";
+        }
+
+        return "Shipment " + shipmentID + " has been updated to " + newStatus + " at " + newLocation + ".";
     }
 
     public string AddNewShipment(
@@ -78,7 +98,7 @@ public class ShipmentController
 
         if (added)
         {
-            return "New shipment added successfully through ShipmentController.";
+            return "Shipment " + shipmentID + " has been added successfully.";
         }
 
         return "New shipment could not be added.";
@@ -95,7 +115,7 @@ public class ShipmentController
 
         if (!accessControlService.CanStaffRunDepartmentOperation(staffMember, shipment))
         {
-            return "Access denied. Staff member is not allowed to run this department operation.";
+            return "Access denied. Staff member is not allowed to record department processing for this shipment.";
         }
 
         try
@@ -104,11 +124,44 @@ public class ShipmentController
 
             selectedOperation.ExecuteOperation(shipment, staffMember);
 
-            return "Department shipment operation completed through ShipmentController.";
+            string processingLabel = GetProcessingLabel(operationType);
+            string trackingMessage = processingLabel + " has been recorded for shipment " + shipmentID + ".";
+
+            shipment.addTrackingUpdate(new TrackingUpdate(
+                "UPD" + DateTime.Now.Ticks,
+                DateTime.Now,
+                trackingMessage
+            ));
+
+            shipmentRepo.SaveChanges();
+
+            return trackingMessage;
         }
         catch
         {
-            return "Invalid department shipment operation selected.";
+            return "Invalid department processing type selected.";
         }
+    }
+
+    private string GetProcessingLabel(string operationType)
+    {
+        string selectedType = operationType.Trim().ToLower();
+
+        if (selectedType.Contains("customer"))
+        {
+            return "Customer Service Processing";
+        }
+
+        if (selectedType.Contains("warehouse"))
+        {
+            return "Warehouse Processing";
+        }
+
+        if (selectedType.Contains("return"))
+        {
+            return "Returned Goods Processing";
+        }
+
+        return "Transport Processing";
     }
 }

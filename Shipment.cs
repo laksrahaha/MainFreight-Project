@@ -101,10 +101,40 @@ public class Shipment
     {
         status = newStatus;
 
+        if (newStatus == "Delivered")
+        {
+            deliveryStatus = "Delivered";
+        }
+        else if (newStatus == "Returned")
+        {
+            deliveryStatus = "Returned";
+        }
+        else
+        {
+            deliveryStatus = "Not Delivered";
+        }
+
         //Observer pattern behaviour:
         //when shipment status changes, Shipment notifies every registered listener
         //so tracking history, customer visibility, and staff visibility react automatically
         NotifyStatusListeners("Shipment status updated to: " + newStatus);
+    }
+
+    public void UpdateCurrentLocation(string newLocation)
+    {
+        currentLocation = newLocation;
+    }
+
+    public void UpdateStatusAndLocation(string newStatus, string newLocation)
+    {
+        UpdateStatus(newStatus);
+        UpdateCurrentLocation(newLocation);
+
+        addTrackingUpdate(new TrackingUpdate(
+            "UPD" + DateTime.Now.Ticks,
+            DateTime.Now,
+            "Shipment status updated to " + newStatus + " at " + newLocation + "."
+        ));
     }
 
     public void UpdateDeliveryStatus(string newDeliveryStatus)
