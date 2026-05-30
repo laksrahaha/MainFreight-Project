@@ -127,14 +127,23 @@ public class Shipment
 
     public void UpdateStatusAndLocation(string newStatus, string newLocation)
     {
-        UpdateStatus(newStatus);
-        UpdateCurrentLocation(newLocation);
+        status = newStatus;
+        currentLocation = newLocation;
 
-        addTrackingUpdate(new TrackingUpdate(
-            "UPD" + DateTime.Now.Ticks,
-            DateTime.Now,
-            "Shipment status updated to " + newStatus + " at " + newLocation + "."
-        ));
+        if (newStatus == "Delivered")
+        {
+            deliveryStatus = "Delivered";
+        }
+        else if (newStatus == "Returned")
+        {
+            deliveryStatus = "Returned";
+        }
+        else
+        {
+            deliveryStatus = "Not Delivered";
+        }
+
+        NotifyStatusListeners("Shipment status updated to " + newStatus + " at " + newLocation + ".");
     }
 
     public void UpdateDeliveryStatus(string newDeliveryStatus)

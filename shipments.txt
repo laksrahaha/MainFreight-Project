@@ -1,6 +1,8 @@
 Ship1|Delivered|Customer Address|Delivered
 Ship2|Delivered|Manukau Hub|Delivered
 Ship3|Delayed|Hamilton Depot|Not Delivered
-ship234|In Transit|mamam|Not Delivered
+ship234|In Transit|Wellington Depot|Not Delivered
 ship232323|In Transit|no|Not Delivered
 ship58|In Transit|lalala|Not Delivered
+ship32198|In Transit|Hamilton Depot|Not Delivered
+shi---|In Transit|Auckland Depot|Not Delivered
