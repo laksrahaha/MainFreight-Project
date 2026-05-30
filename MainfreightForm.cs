@@ -62,7 +62,7 @@ public class MainfreightForm : Form
     private ComboBox statusComboBox = null!;
     private ComboBox updateLocationComboBox = null!;
     private TextBox newShipmentIDTextBox = null!;
-    private TextBox newLocationTextBox = null!;
+    private ComboBox newLocationComboBox = null!;
     private RichTextBox staffResultBox = null!;
 
     private ComboBox recordsShipmentComboBox = null!;
@@ -302,10 +302,12 @@ public class MainfreightForm : Form
 
         AddLabel(loginPanel, "Username:", 425, 235);
         usernameTextBox = AddTextBox(loginPanel, 425, 268, 360);
-
+        usernameTextBox.TextChanged += (sender, e) => ResetLoginInputStyles();
+        
         AddLabel(loginPanel, "Password:", 425, 328);
         passwordTextBox = AddTextBox(loginPanel, 425, 361, 360);
         passwordTextBox.PasswordChar = '*';
+        passwordTextBox.TextChanged += (sender, e) => ResetLoginInputStyles();
 
         loginMessageLabel = AddPlainText(loginPanel, "", 425, 425, 520);
         loginMessageLabel.Height = 60;
@@ -391,7 +393,9 @@ public class MainfreightForm : Form
         newShipmentIDTextBox = AddTextBox(tab, 240, 385, 220);
 
         AddLabel(tab, "Location:", 50, 440);
-        newLocationTextBox = AddTextBox(tab, 240, 435, 220);
+        newLocationComboBox = AddComboBox(tab, 240, 435, 290);
+        newLocationComboBox.Items.AddRange(GetDepotLocationOptions());
+        newLocationComboBox.SelectedIndex = 0;
 
         Button addButton = AddPrimaryButton(tab, "Add Shipment", 570, 385, 170);
         addButton.Click += AddShipment_Click;
@@ -599,44 +603,75 @@ public class MainfreightForm : Form
     }
 
     private void LoginButton_Click(object? sender, EventArgs e)
+{
+    ResetLoginInputStyles();
+
+    string username = usernameTextBox.Text.Trim();
+    string password = passwordTextBox.Text.Trim();
+
+    if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
     {
-        string username = usernameTextBox.Text.Trim();
-        string password = passwordTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(username))
         {
-            MessageBox.Show("Please enter both username and password.", "Login Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
+            HighlightLoginBox(usernameTextBox);
         }
 
-        UserAccount account = authenticationService.Authenticate(username, password);
-
-        if (account == null)
+        if (string.IsNullOrWhiteSpace(password))
         {
-            MessageBox.Show("Invalid login details or inactive account.", "Login Failed",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
+            HighlightLoginBox(passwordTextBox);
         }
 
-        if (selectedAccessType == "Admin" && account.Role != UserRole.Admin)
-        {
-            MessageBox.Show("Admin access requires an Admin account.", "Access Denied",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        if (selectedAccessType == "Staff" && !accessControlService.CanUseStaffOperations(account))
-        {
-            MessageBox.Show("This account cannot access staff operations.", "Access Denied",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        currentAccount = account;
-        ShowDashboardPanel();
+        MessageBox.Show("Please enter both username and password.", "Login Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
     }
 
+    UserAccount account = authenticationService.Authenticate(username, password);
+
+    if (account == null)
+    {
+        bool usernameExists = UsernameExistsInAccountFile(username);
+
+        if (usernameExists)
+        {
+            HighlightLoginBox(passwordTextBox);
+            loginMessageLabel.Text = "Password is incorrect";
+        }
+        else
+        {
+            HighlightLoginBox(usernameTextBox);
+            HighlightLoginBox(passwordTextBox);
+            loginMessageLabel.Text = "Invalid login details. Please check the highlighted fields.";
+        }
+
+        MessageBox.Show("Invalid login details or inactive account.", "Login Failed",
+            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+    }
+
+    if (selectedAccessType == "Admin" && account.Role != UserRole.Admin)
+    {
+        HighlightLoginBox(usernameTextBox);
+        loginMessageLabel.Text = "Admin access requires an Admin account.";
+
+        MessageBox.Show("Admin access requires an Admin account.", "Access Denied",
+            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    if (selectedAccessType == "Staff" && !accessControlService.CanUseStaffOperations(account))
+    {
+        HighlightLoginBox(usernameTextBox);
+        loginMessageLabel.Text = "This account cannot access staff operations.";
+
+        MessageBox.Show("This account cannot access staff operations.", "Access Denied",
+            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    currentAccount = account;
+    ShowDashboardPanel();
+}
     private void UpdateShipmentStatus_Click(object? sender, EventArgs e)
     {
         Staff? staff = GetSelectedStaff(staffComboBox);
@@ -673,58 +708,57 @@ public class MainfreightForm : Form
     }
 
     private void AddShipment_Click(object? sender, EventArgs e)
+{
+    Staff? staff = GetSelectedStaff(staffComboBox);
+
+    if (staff == null)
     {
-        Staff? staff = GetSelectedStaff(staffComboBox);
-
-        if (staff == null)
-        {
-            MessageBox.Show("Please select a staff member.", "Input Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        string shipmentID = newShipmentIDTextBox.Text.Trim();
-        string location = newLocationTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(shipmentID) || string.IsNullOrWhiteSpace(location))
-        {
-            MessageBox.Show("Shipment ID and location cannot be blank.", "Input Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        CaptureConsoleOutput(() =>
-        {
-            shipmentController.AddNewShipment(staff, shipmentID, "In Transit", location, "Not Delivered");
-        });
-
-        newShipmentIDTextBox.Clear();
-        newLocationTextBox.Clear();
-
-        RefreshShipmentSelectors();
-
-        Shipment? newShipment = shipmentController.FindShipmentByID(shipmentID);
-
-        if (newShipment != null)
-        {
-            ClearResultBox(staffResultBox);
-            AppendBold(staffResultBox, "Shipment Created" + Environment.NewLine + Environment.NewLine);
-            AppendBold(staffResultBox, "Shipment ID: ");
-            AppendNormal(staffResultBox, shipmentID + Environment.NewLine);
-            AppendBold(staffResultBox, "Shipment Status: ");
-            AppendNormal(staffResultBox, "In Transit" + Environment.NewLine);
-            AppendBold(staffResultBox, "Current Location: ");
-            AppendNormal(staffResultBox, location + Environment.NewLine);
-            AppendBold(staffResultBox, "Delivery Status: ");
-            AppendNormal(staffResultBox, "Not Delivered");
-        }
-        else
-        {
-            ShowPlainOutput(staffResultBox, "Shipment Created",
-                "Shipment " + shipmentID + " has been added successfully.");
-        }
+        MessageBox.Show("Please select a staff member.", "Input Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
     }
 
+    string shipmentID = newShipmentIDTextBox.Text.Trim();
+    string location = newLocationComboBox.Text.Trim();
+
+    if (string.IsNullOrWhiteSpace(shipmentID) || string.IsNullOrWhiteSpace(location))
+    {
+        MessageBox.Show("Shipment ID and location cannot be blank.", "Input Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    CaptureConsoleOutput(() =>
+    {
+        shipmentController.AddNewShipment(staff, shipmentID, "In Transit", location, "Not Delivered");
+    });
+
+    newShipmentIDTextBox.Clear();
+    newLocationComboBox.SelectedIndex = 0;
+
+    RefreshShipmentSelectors();
+
+    Shipment? newShipment = shipmentController.FindShipmentByID(shipmentID);
+
+    if (newShipment != null)
+    {
+        ClearResultBox(staffResultBox);
+        AppendBold(staffResultBox, "Shipment Created" + Environment.NewLine + Environment.NewLine);
+        AppendBold(staffResultBox, "Shipment ID: ");
+        AppendNormal(staffResultBox, shipmentID + Environment.NewLine);
+        AppendBold(staffResultBox, "Shipment Status: ");
+        AppendNormal(staffResultBox, "In Transit" + Environment.NewLine);
+        AppendBold(staffResultBox, "Starting Location: ");
+        AppendNormal(staffResultBox, location + Environment.NewLine);
+        AppendBold(staffResultBox, "Delivery Status: ");
+        AppendNormal(staffResultBox, "Not Delivered");
+    }
+    else
+    {
+        ShowPlainOutput(staffResultBox, "Shipment Created",
+            "Shipment " + shipmentID + " has been added successfully.");
+    }
+}
     private void RefreshRecords_Click(object? sender, EventArgs e)
     {
         RefreshShipmentSelectors();
@@ -814,6 +848,63 @@ public class MainfreightForm : Form
 
         return hasValidEnding && hasOneAtSymbol && email.Length > 10;
     }
+
+    private void ResetLoginInputStyles()
+{
+    if (usernameTextBox != null)
+    {
+        usernameTextBox.BackColor = Color.White;
+    }
+
+    if (passwordTextBox != null)
+    {
+        passwordTextBox.BackColor = Color.White;
+    }
+
+    if (loginMessageLabel != null)
+    {
+        loginMessageLabel.ForeColor = Color.Firebrick;
+    }
+}
+
+private void HighlightLoginBox(TextBox textBox)
+{
+    textBox.BackColor = Color.FromArgb(255, 225, 225);
+}
+
+private bool UsernameExistsInAccountFile(string username)
+{
+    if (string.IsNullOrWhiteSpace(username))
+    {
+        return false;
+    }
+
+    if (!File.Exists(accountFilePath))
+    {
+        return false;
+    }
+
+    string[] accountLines = File.ReadAllLines(accountFilePath);
+
+    foreach (string line in accountLines)
+    {
+        string cleanLine = line.Trim();
+
+        if (string.IsNullOrWhiteSpace(cleanLine))
+        {
+            continue;
+        }
+
+        string[] parts = cleanLine.Split('|');
+
+        if (parts.Length > 0 && parts[0].Trim().Equals(username, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
     private void AddStaffMember_Click(object? sender, EventArgs e)
     {
@@ -1004,6 +1095,19 @@ public class MainfreightForm : Form
         };
     }
 
+    private string[] GetDepotLocationOptions()
+    {
+        return new string []
+        {
+            "Auckland Depot",
+            "Manukau Hub",
+            "Hamilton Depot",
+            "Wellington Depot",
+            "Christchurch Warehouse"
+
+        };
+        
+    }
     private void ShowStatusUpdatedResult(RichTextBox box, Shipment shipment, string selectedStatus)
     {
         string[] updatedData = ExtractShipmentData(shipment.getShipmentInfo());

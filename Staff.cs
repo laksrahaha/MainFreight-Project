@@ -35,7 +35,7 @@ public class Staff : User
         }
         else if (newStatus == "Returned")
         {
-            shipment.UpdateDeliveryStatus("Returning");
+            shipment.UpdateDeliveryStatus("Returned");
         }
         else
         {
